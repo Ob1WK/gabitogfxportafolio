@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ArrowUpRight, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -26,12 +26,26 @@ interface Project {
   }>
 }
 
+interface RelatedProject {
+  id: string
+  titulo: string
+  categoria: string[]
+  descripcion: {
+    es: string
+    en: string
+  }
+  medios: Array<{
+    tipo: string
+    url: string
+  }>
+}
+
 export default function ProjectDetailClient({
   project,
   otherProjects,
 }: {
   project: Project
-  otherProjects: Project[]
+  otherProjects: RelatedProject[]
 }) {
   const router = useRouter()
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
@@ -47,25 +61,32 @@ export default function ProjectDetailClient({
   const currentMedia = project.medios[currentMediaIndex]
 
   return (
-    <div className="min-h-screen bg-[#FF5C00]">
+    <div className="min-h-screen bg-[#171719]">
       {/* NAV */}
-      <nav className="flex flex-wrap gap-2 p-5 md:p-7 md:px-10">
-        <button 
-          onClick={() => router.push("/")}
-          className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#1a1a2e] text-white transition-colors flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Volver
-        </button>
-        <a href="/#proyectos" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#F5F2ED] text-[#1a1a2e] hover:bg-[#e8e4dd] transition-colors">Proyectos</a>
-        <a href="/#contacto" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#F5F2ED] text-[#1a1a2e] hover:bg-[#e8e4dd] transition-colors">Contacto</a>
-      </nav>
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#171719]/90 text-white backdrop-blur-xl">
+        <nav className="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-5 md:px-10">
+          <button
+            onClick={() => router.push("/")}
+            className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-white/70 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver
+          </button>
+          <a href="/" className="font-serif text-xl font-bold tracking-[-0.04em]">
+            Gabito<span className="text-[#ff5c00]">GFX</span>
+          </a>
+          <a href="/#contacto" className="rounded-full bg-[#ff5c00] px-4 py-2.5 text-sm font-semibold hover:bg-[#ff7426]">
+            Hablemos
+          </a>
+        </nav>
+      </header>
 
       {/* PROJECT DETAIL CARD */}
-      <section className="mx-4 md:mx-10 animate-fade-up">
-        <div className="bg-[#F5F2ED] rounded-[20px] p-6 md:p-12">
+      <section className="bg-[#f4f0e8] px-5 py-10 md:px-10 md:py-16 animate-fade-up">
+        <div className="mx-auto max-w-[1600px]">
           {/* Title */}
-          <h1 className="font-serif font-bold text-[#1a1a2e] text-[clamp(40px,6vw,64px)] leading-[1.1] mb-8">
+          <span className="section-kicker mb-6">Proyecto seleccionado</span>
+          <h1 className="font-serif font-bold text-[#171719] text-[clamp(3.4rem,8vw,8rem)] tracking-[-0.06em] leading-[0.9] mb-10">
             {project.titulo}
           </h1>
 
@@ -192,15 +213,12 @@ export default function ProjectDetailClient({
         </div>
       </section>
 
-      <div className="h-5" />
-
       {/* OTHER PROJECTS */}
-      <section className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-        <div className="bg-[#f0ece5] rounded-[20px] p-6 md:p-12">
+      <section className="bg-[#ff5c00] px-5 py-16 md:px-10 md:py-24 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+        <div className="mx-auto max-w-[1600px]">
           <div className="flex items-center gap-3 mb-8">
-            <h2 className="text-xl font-medium text-[#1a1a2e]">Otros Proyectos</h2>
-            <span className="text-[#FF5C00] text-xl">◆</span>
-            <div className="flex-1 h-px bg-[#FF5C00]" />
+            <h2 className="font-serif text-4xl font-bold text-[#171719] md:text-6xl">Seguí explorando</h2>
+            <div className="flex-1 h-px bg-black/20" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -216,7 +234,7 @@ export default function ProjectDetailClient({
                   fill
                   className="object-cover transition-transform duration-400 group-hover:scale-[1.04]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5 opacity-100 transition-opacity duration-300">
                   <h3 className="font-serif text-lg text-white mb-1">{relatedProject.titulo}</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {relatedProject.categoria.slice(0, 2).map((cat) => (
@@ -232,29 +250,27 @@ export default function ProjectDetailClient({
         </div>
       </section>
 
-      <div className="h-5" />
-
       {/* CTA */}
-      <section className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-        <div className="bg-[#1a1a2e] rounded-[20px] p-8 md:p-12 text-center">
-          <h3 className="font-serif font-bold text-2xl md:text-3xl text-white mb-4">
-            ¿Te gustó este proyecto?
+      <section className="bg-[#171719] px-5 py-20 md:px-10 md:py-28 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <div className="mx-auto max-w-[1200px] text-center">
+          <h3 className="font-serif font-bold text-[clamp(3rem,7vw,7rem)] leading-[0.9] tracking-[-0.05em] text-white mb-6">
+            ¿Hacemos el próximo juntos?
           </h3>
-          <p className="text-base text-white/70 mb-6 max-w-md mx-auto">
-            Hablemos sobre cómo puedo ayudarte con tu próximo proyecto
+          <p className="text-base text-white/55 mb-8 max-w-md mx-auto">
+            Contame tu idea y vemos qué necesita para convertirse en una identidad clara y propia.
           </p>
           <button 
             onClick={() => router.push("/#contacto")} 
-            className="bg-[#FF5C00] text-white py-3 px-8 rounded-full font-medium hover:bg-[#CC4A00] transition-colors cursor-pointer"
+            className="group inline-flex items-center gap-3 bg-[#FF5C00] text-white py-4 px-8 rounded-full font-semibold hover:bg-[#ff7426] transition-colors cursor-pointer"
           >
-            Contactar
+            Hablemos <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
           </button>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="text-center py-8 md:py-10 px-10 text-[13px] text-white/60">
-        © {new Date().getFullYear()} GabitoGFX. Todos los derechos reservados.
+      <footer className="border-t border-white/10 bg-[#171719] text-center py-8 md:py-10 px-10 text-[13px] text-white/40">
+        © {new Date().getFullYear()} GabitoGFX · Gabriel Anibaldi
       </footer>
     </div>
   )

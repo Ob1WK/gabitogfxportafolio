@@ -1,10 +1,18 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Instagram, Mail, Send } from "lucide-react"
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Check,
+  Instagram,
+  Mail,
+  Send,
+  Sparkles,
+} from "lucide-react"
 
 interface Proyecto {
   id: string
@@ -21,442 +29,530 @@ interface PortfolioClientProps {
 }
 
 const servicios = [
-  "Diseño Gráfico",
-  "Branding", 
-  "Identidad Visual",
-  "Edición de Video"
+  {
+    numero: "01",
+    titulo: "Identidad visual",
+    descripcion: "Una estética propia y coherente para que tu marca sea fácil de reconocer.",
+  },
+  {
+    numero: "02",
+    titulo: "Branding",
+    descripcion: "Concepto, dirección visual y sistema gráfico pensados como un conjunto.",
+  },
+  {
+    numero: "03",
+    titulo: "Diseño gráfico",
+    descripcion: "Piezas digitales e impresas que comunican con claridad y personalidad.",
+  },
+  {
+    numero: "04",
+    titulo: "Edición de video",
+    descripcion: "Contenido dinámico, cuidado y adaptado a cada canal de comunicación.",
+  },
 ]
 
-const logros = [
-  "Club Argentino",
-  "Gaming-City",
-  "Barbatero"
-]
+const clientes = ["Club Argentino", "Gaming-City", "Barbatero"]
 
 const testimonios = [
   {
+    texto: "Gabriel supo plasmar las ideas que tenía para Almendro y convertirlas en una identidad completa y coherente. Yo no sabía exactamente qué necesitaba pedir, pero su propuesta integral me ayudó a descubrir todo lo que la marca necesitaba y hoy veo el valor de cada elemento.",
+    autor: "Carolina",
+    cargo: "Almendro",
+  },
+  {
     texto: "Gabriel transformó completamente nuestra imagen de marca. Su trabajo es excepcional y muy profesional.",
     autor: "Gian Ezequiel",
-    cargo: "Barbatero Barberstudio"
+    cargo: "Barbatero Barberstudio",
   },
   {
     texto: "El trabajo de Gabriel es realmente espectacular. Se nota su talento y su gran futuro en el diseño gráfico.",
-    autor: "Adrian Varela", 
-    cargo: "Presidente Club Argentino"
+    autor: "Adrian Varela",
+    cargo: "Presidente Club Argentino",
   },
   {
     texto: "Gaby fue una parte fundamental del equipo de marketing. Siempre cumplió con todo, con mucha calidad y rapidez.",
     autor: "Pablo Leis",
-    cargo: "Gaming-City"
+    cargo: "Gaming-City",
   },
-  {
-    texto: "Gabriel supo plasmar las ideas que tenía para Almendro y convertirlas en una identidad completa y coherente. Yo no sabía exactamente qué necesitaba pedir, pero su propuesta integral me ayudó a descubrir todo lo que la marca necesitaba y hoy veo el valor de cada elemento.",
-    autor: "Carolina",
-    cargo: "Almendro"
-  }
 ]
+
+const pasos = [
+  ["01", "Entender", "Conversamos sobre la marca, el problema y lo que necesitás lograr."],
+  ["02", "Crear", "Desarrollo una dirección visual con intención, criterio y personalidad."],
+  ["03", "Entregar", "Recibís un sistema claro y piezas listas para usar en tu negocio."],
+]
+
+function projectCategories(project: Proyecto) {
+  return (Array.isArray(project.categoria) ? project.categoria : [project.categoria]).filter(Boolean)
+}
+
+function projectImage(project?: Proyecto) {
+  if (!project) return "/placeholder.svg"
+  return project.medios?.find((medio) => medio.tipo === "imagen")?.url || "/placeholder.svg"
+}
 
 export default function PortfolioClient({ projects }: PortfolioClientProps) {
   const [filtroActivo, setFiltroActivo] = useState("Todo")
   const [formData, setFormData] = useState({ nombre: "", email: "", mensaje: "" })
   const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
-  const categorias = ["Todo", "Diseño Gráfico", "Branding", "Motion Graphics", "Identidad Visual"]
+  const categorias = useMemo(
+    () => ["Todo", ...Array.from(new Set(projects.flatMap(projectCategories)))],
+    [projects],
+  )
 
-  const proyectosFiltrados = filtroActivo === "Todo" 
-    ? projects 
-    : projects.filter(p => {
-        const cats = Array.isArray(p.categoria) ? p.categoria : [p.categoria]
-        return cats.some(c => c.toLowerCase().includes(filtroActivo.toLowerCase()))
-      })
+  const proyectosFiltrados = filtroActivo === "Todo"
+    ? projects
+    : projects.filter((project) => projectCategories(project).includes(filtroActivo))
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const proyectoDestacado = projects[0]
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     setFormStatus("loading")
-    
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
-      
-      if (response.ok) {
-        setFormStatus("success")
-        setFormData({ nombre: "", email: "", mensaje: "" })
-        setTimeout(() => setFormStatus("idle"), 5000)
-      } else {
-        setFormStatus("error")
-        setTimeout(() => setFormStatus("idle"), 5000)
-      }
+
+      if (!response.ok) throw new Error("No se pudo enviar el mensaje")
+
+      setFormStatus("success")
+      setFormData({ nombre: "", email: "", mensaje: "" })
     } catch {
       setFormStatus("error")
+    } finally {
       setTimeout(() => setFormStatus("idle"), 5000)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#FF5C00]">
-      {/* NAV */}
-      <nav className="flex flex-wrap gap-2 p-5 md:p-7 md:px-10">
-        <a href="#inicio" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#1a1a2e] text-white transition-colors">Inicio</a>
-        <a href="#proyectos" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#F5F2ED] text-[#1a1a2e] hover:bg-[#e8e4dd] transition-colors">Proyectos</a>
-        <a href="#contacto" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#F5F2ED] text-[#1a1a2e] hover:bg-[#e8e4dd] transition-colors">Contacto</a>
-        <a href="#sobre-mi" className="text-[13px] font-medium px-4 py-2 rounded-full bg-[#F5F2ED] text-[#1a1a2e] hover:bg-[#e8e4dd] transition-colors">Archivo</a>
-      </nav>
+    <div className="min-h-screen overflow-hidden bg-[#171719] text-[#171719]">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#171719]/90 text-white backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-5 md:px-10">
+          <a href="#inicio" className="font-serif text-xl font-bold tracking-[-0.04em]">
+            Gabito<span className="text-[#ff5c00]">GFX</span>
+          </a>
 
-      {/* HERO CARD */}
-      <section id="inicio" className="mx-4 md:mx-10 animate-fade-up">
-        <div className="bg-[#F5F2ED] rounded-[20px] p-6 md:p-12">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
-            {/* Left: Text */}
-            <div className="pt-4 md:pt-10">
-              <p className="text-lg md:text-[18px] font-normal text-[#1a1a2e] leading-[1.5] max-w-[380px]">
-                Soy Gabriel Anibaldi, diseñador gráfico freelance. Creo identidades y piezas visuales que se ven bien y conectan de verdad.
-              </p>
-            </div>
-            
-            {/* Right: Services Pill Card */}
-            <div className="bg-[#FF5C00] rounded-2xl p-8 md:p-10 relative min-h-[260px] overflow-hidden">
-              <div className="relative h-[200px]">
-                {servicios.map((servicio, i) => (
-                  <span 
-                    key={servicio}
-                    className="absolute bg-[#F5F2ED] text-[#1a1a2e] text-[13px] font-medium px-5 py-2.5 rounded-full whitespace-nowrap shadow-lg"
-                    style={{
-                      bottom: `${10 + i * 40}px`,
-                      left: `${i * 65}px`,
-                      transform: "rotate(-8deg)",
-                      transformOrigin: "left center"
-                    }}
-                  >
-                    {servicio}
-                  </span>
-                ))}
+          <nav aria-label="Navegación principal" className="hidden items-center gap-8 text-sm md:flex">
+            <a href="#proyectos" className="text-white/70 hover:text-white">Proyectos</a>
+            <a href="#servicios" className="text-white/70 hover:text-white">Servicios</a>
+            <a href="#sobre-mi" className="text-white/70 hover:text-white">Sobre mí</a>
+          </nav>
+
+          <a
+            href="#contacto"
+            className="group flex items-center gap-2 rounded-full bg-[#ff5c00] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#ff7426]"
+          >
+            Hablemos
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </div>
+      </header>
+
+      <main>
+        <section id="inicio" className="bg-[#f4f0e8]">
+          <div className="mx-auto grid min-h-[calc(100svh-72px)] max-w-[1600px] lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="flex flex-col justify-between px-5 py-10 md:px-10 md:py-14 lg:py-16">
+              <div className="reveal flex w-fit items-center gap-2 rounded-full border border-[#171719]/15 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] sm:text-xs">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-[#ff5c00]" />
+                Disponible para proyectos freelance
               </div>
-              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 font-serif text-[28px] text-white whitespace-nowrap">
-                Servicios
-              </span>
+
+              <div className="my-16 lg:my-10">
+                <p className="reveal reveal-delay-1 mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-[#ff5c00]">
+                  Diseñador gráfico · Desde 2019
+                </p>
+                <h1 className="reveal reveal-delay-2 max-w-[900px] font-serif text-[clamp(3.65rem,7.4vw,8.2rem)] font-bold leading-[0.86] tracking-[-0.065em]">
+                  Diseño marcas que se sienten <em className="font-normal text-[#ff5c00]">propias.</em>
+                </h1>
+                <p className="reveal reveal-delay-3 mt-7 max-w-xl text-base leading-relaxed text-[#545257] md:text-lg">
+                  Transformo ideas en identidades visuales claras, memorables y listas para conectar con las personas correctas.
+                </p>
+                <div className="reveal reveal-delay-4 mt-8 flex flex-wrap gap-3">
+                  <a
+                    href="#proyectos"
+                    className="group flex items-center gap-3 rounded-full bg-[#171719] px-6 py-3.5 text-sm font-semibold text-white hover:bg-[#ff5c00]"
+                  >
+                    Ver proyectos
+                    <ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
+                  </a>
+                  <a
+                    href="mailto:gabrielanibaldi@gmail.com"
+                    className="flex items-center rounded-full border border-[#171719]/20 px-6 py-3.5 text-sm font-semibold hover:border-[#171719]"
+                  >
+                    gabrielanibaldi@gmail.com
+                  </a>
+                </div>
+              </div>
+
+              <div className="reveal reveal-delay-4 flex items-end justify-between border-t border-[#171719]/15 pt-5">
+                <p className="max-w-xs text-xs leading-relaxed text-[#6a676c]">
+                  Branding · Identidad visual · Diseño gráfico · Edición de video
+                </p>
+                <span className="font-serif text-lg italic">Gabriel Anibaldi</span>
+              </div>
+            </div>
+
+            <div className="relative min-h-[560px] overflow-hidden bg-[#ff5c00] p-5 md:p-10 lg:min-h-full">
+              <div className="hero-orbit hero-orbit-one" />
+              <div className="hero-orbit hero-orbit-two" />
+              <div className="relative flex h-full min-h-[520px] items-center justify-center">
+                <div className="hero-project-card reveal reveal-delay-3 relative aspect-[4/5] w-[min(78%,520px)] overflow-hidden rounded-[28px] bg-[#171719] shadow-2xl">
+                  {proyectoDestacado ? (
+                    <>
+                      <Image
+                        src={projectImage(proyectoDestacado)}
+                        alt={proyectoDestacado.titulo}
+                        fill
+                        sizes="(max-width: 1024px) 78vw, 38vw"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-8">
+                        <div>
+                          <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">Selección de trabajo</span>
+                          <h2 className="font-serif text-3xl font-bold leading-none md:text-4xl">{proyectoDestacado.titulo}</h2>
+                        </div>
+                        <Link
+                          href={`/proyecto/${proyectoDestacado.id}`}
+                          aria-label={`Ver proyecto ${proyectoDestacado.titulo}`}
+                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#ff5c00]"
+                        >
+                          <ArrowUpRight className="h-5 w-5" />
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex h-full items-center justify-center p-10 text-center font-serif text-4xl text-white">
+                      Ideas con identidad propia.
+                    </div>
+                  )}
+                </div>
+
+                <div className="absolute left-1 top-[16%] rotate-[-8deg] rounded-full bg-[#f4f0e8] px-4 py-2 text-xs font-semibold shadow-lg md:left-4">
+                  Identidad visual
+                </div>
+                <div className="absolute right-0 top-[25%] rotate-[8deg] rounded-full bg-[#171719] px-4 py-2 text-xs font-semibold text-white shadow-lg md:right-3">
+                  Diseño con intención
+                </div>
+                <div className="absolute bottom-[13%] left-0 rotate-[6deg] rounded-full bg-white px-4 py-2 text-xs font-semibold shadow-lg md:left-5">
+                  Estrategia + estética
+                </div>
+              </div>
             </div>
           </div>
-          
-          {/* Big Name */}
-          <h1 className="font-serif font-bold text-[#FF5C00] leading-[0.9] tracking-[-2px] pt-6 text-[clamp(80px,12vw,160px)]">
-            GabitoGFX
-          </h1>
+        </section>
+
+        <div className="overflow-hidden border-y border-white/10 bg-[#171719] py-4 text-white" aria-hidden="true">
+          <div className="marquee-track flex w-max gap-10 text-sm font-semibold uppercase tracking-[0.16em]">
+            {[...servicios, ...servicios].map((servicio, index) => (
+              <span key={`${servicio.titulo}-${index}`} className="flex items-center gap-10 whitespace-nowrap">
+                {servicio.titulo}
+                <Sparkles className="h-4 w-4 text-[#ff5c00]" />
+              </span>
+            ))}
+          </div>
         </div>
-      </section>
 
-      <div className="h-5" />
-
-      {/* ABOUT SECTION */}
-      <section id="sobre-mi" className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-        <div className="bg-[#f0ece5] rounded-[20px] p-6 md:p-14">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
-            {/* Left: Mobile Mockup */}
-            <div className="bg-[#F5F2ED] rounded-2xl p-6 shadow-[0_8px_40px_rgba(0,0,0,0.08)] max-w-[340px] hidden md:block">
-              <div className="flex flex-wrap gap-1.5 pb-4">
-                <span className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a2e] text-white">Inicio</span>
-                <span className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#F5F2ED] text-[#1a1a2e] border border-[#e5e1da]">Proyectos</span>
-                <span className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#F5F2ED] text-[#1a1a2e] border border-[#e5e1da]">Contacto</span>
+        <section id="proyectos" className="bg-[#f4f0e8] px-5 py-20 md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="mb-12 grid gap-8 border-b border-[#171719]/15 pb-10 md:grid-cols-[1fr_0.65fr] md:items-end">
+              <div>
+                <span className="section-kicker">Trabajo seleccionado</span>
+                <h2 className="mt-4 max-w-4xl font-serif text-[clamp(3.2rem,7vw,7.4rem)] font-bold leading-[0.9] tracking-[-0.055em]">
+                  Proyectos con <em className="font-normal text-[#ff5c00]">carácter.</em>
+                </h2>
               </div>
-              <p className="text-sm text-[#1a1a2e] mb-4 leading-[1.5]">
-                Soy Gabriel Anibaldi, diseñador gráfico freelance...
+              <p className="max-w-lg text-base leading-relaxed text-[#5f5c61] md:justify-self-end md:text-lg">
+                Una selección de identidades, campañas y piezas visuales creadas para convertir una idea en algo que se pueda reconocer y recordar.
               </p>
-              <div className="bg-[#FF5C00] rounded-xl p-5 pb-6 relative h-[200px] overflow-hidden mb-0">
-                <div className="relative h-[155px]">
-                  {["Diseño Gráfico", "Branding", "Identidad", "Video"].map((s, i) => (
-                    <span 
-                      key={s}
-                      className="absolute bg-[#F5F2ED] text-[#1a1a2e] text-[11px] font-medium px-3.5 py-[7px] rounded-full whitespace-nowrap"
-                      style={{
-                        bottom: `${8 + i * 32}px`,
-                        left: `${i * 45}px`,
-                        transform: "rotate(-8deg)"
-                      }}
+            </div>
+
+            {categorias.length > 1 && (
+              <div className="mb-8 flex gap-2 overflow-x-auto pb-2">
+                {categorias.map((categoria) => (
+                  <button
+                    key={categoria}
+                    onClick={() => setFiltroActivo(categoria)}
+                    className={`shrink-0 cursor-pointer rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${
+                      filtroActivo === categoria
+                        ? "border-[#171719] bg-[#171719] text-white"
+                        : "border-[#171719]/20 bg-transparent hover:border-[#ff5c00] hover:text-[#ff5c00]"
+                    }`}
+                  >
+                    {categoria}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {proyectosFiltrados.length > 0 ? (
+              <div className="grid gap-5 md:grid-cols-2">
+                {proyectosFiltrados.map((proyecto, index) => {
+                  const categoriasProyecto = projectCategories(proyecto)
+                  const featured = index === 0 && proyectosFiltrados.length > 2
+
+                  return (
+                    <Link
+                      key={proyecto.id}
+                      href={`/proyecto/${proyecto.id}`}
+                      className={`project-link group relative overflow-hidden rounded-[24px] bg-[#d8d4ce] ${
+                        featured ? "aspect-[4/3] md:col-span-2 md:aspect-[2/1]" : "aspect-[4/3]"
+                      }`}
                     >
-                      {s}
+                      <Image
+                        src={projectImage(proyecto)}
+                        alt={proyecto.titulo}
+                        fill
+                        sizes={featured ? "(max-width: 768px) 100vw, 100vw" : "(max-width: 768px) 100vw, 50vw"}
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/5 to-black/5" />
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white md:p-7">
+                        <div>
+                          <div className="mb-2 flex flex-wrap gap-2">
+                            {categoriasProyecto.slice(0, 2).map((categoria) => (
+                              <span key={categoria} className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/65">
+                                {categoria}
+                              </span>
+                            ))}
+                          </div>
+                          <h3 className={`font-serif font-bold leading-none ${featured ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}>
+                            {proyecto.titulo}
+                          </h3>
+                        </div>
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ff5c00] transition-transform group-hover:rotate-12 group-hover:scale-105">
+                          <ArrowUpRight className="h-5 w-5" />
+                        </span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="rounded-[24px] border border-dashed border-[#171719]/25 py-16 text-center text-sm text-[#5f5c61]">
+                No hay proyectos en esta categoría por el momento.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section id="servicios" className="bg-[#171719] px-5 py-20 text-white md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="grid gap-14 lg:grid-cols-[0.72fr_1.28fr]">
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <span className="section-kicker text-[#ff7a32]">Cómo puedo ayudarte</span>
+                <h2 className="mt-4 max-w-xl font-serif text-[clamp(3rem,6vw,6.5rem)] font-bold leading-[0.9] tracking-[-0.05em]">
+                  Diseño que hace más clara tu <em className="font-normal text-[#ff5c00]">marca.</em>
+                </h2>
+                <p className="mt-7 max-w-md leading-relaxed text-white/55">
+                  No necesitás llegar con todo resuelto. Te ayudo a ordenar la idea, encontrar la dirección visual y construir lo que la marca realmente necesita.
+                </p>
+                <a href="#contacto" className="group mt-8 inline-flex items-center gap-3 text-sm font-semibold text-[#ff7a32]">
+                  Contame tu idea
+                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </a>
+              </div>
+
+              <div className="border-t border-white/15">
+                {servicios.map((servicio) => (
+                  <article key={servicio.numero} className="service-row grid gap-3 border-b border-white/15 py-7 md:grid-cols-[70px_0.8fr_1fr] md:items-center md:py-9">
+                    <span className="text-xs font-semibold text-[#ff7a32]">{servicio.numero}</span>
+                    <h3 className="font-serif text-3xl font-bold tracking-[-0.035em] md:text-4xl">{servicio.titulo}</h3>
+                    <p className="max-w-md text-sm leading-relaxed text-white/50 md:justify-self-end md:text-base">{servicio.descripcion}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sobre-mi" className="bg-[#ff5c00] px-5 py-20 md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+              <div>
+                <span className="section-kicker border-black/20 text-[#171719]">Sobre mí</span>
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  <div className="rounded-[24px] bg-[#171719] p-6 text-white md:p-8">
+                    <strong className="font-serif text-5xl md:text-6xl">2019</strong>
+                    <span className="mt-3 block text-xs leading-relaxed text-white/55">Año en el que empecé a trabajar en diseño</span>
+                  </div>
+                  <div className="rounded-[24px] bg-[#f4f0e8] p-6 md:p-8">
+                    <strong className="font-serif text-3xl md:text-4xl">Freelance</strong>
+                    <span className="mt-3 block text-xs leading-relaxed text-[#5f5c61]">Trabajo directo, cercano y adaptado a cada proyecto</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="font-serif text-[clamp(2.7rem,5vw,5.7rem)] font-bold leading-[0.98] tracking-[-0.05em]">
+                  Soy Gabriel Anibaldi. Le doy forma visual a ideas que todavía están buscando su identidad.
+                </h2>
+                <p className="mt-7 max-w-3xl text-base leading-relaxed text-[#171719]/70 md:text-lg">
+                  Desde 2019 trabajo de manera freelance en diseño gráfico. Me enfoco en desarrollar identidades y piezas visuales cuidadas, convirtiendo cada idea en una propuesta clara, atractiva y coherente.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-2">
+                  {["Photoshop", "Illustrator", "After Effects", "Premiere"].map((herramienta) => (
+                    <span key={herramienta} className="rounded-full border border-[#171719]/25 px-4 py-2 text-xs font-semibold">
+                      {herramienta}
                     </span>
                   ))}
                 </div>
-                <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-serif text-xl text-white whitespace-nowrap">
-                  Servicios
-                </span>
-              </div>
-              <div className="font-serif font-bold text-[#FF5C00] text-[42px] leading-none mt-3">
-                GabitoGFX
               </div>
             </div>
 
-            {/* Right: About Me */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <h2 className="text-xl font-medium text-[#1a1a2e]">Sobre mí</h2>
-                <span className="text-[#FF5C00] text-xl">◆</span>
-                <div className="flex-1 h-px bg-[#FF5C00]" />
-              </div>
-              
-              <p className="text-base leading-[1.7] text-[#1a1a2e] mb-8">
-                Desde 2019 trabajo de manera freelance en diseño gráfico. Me enfoco en desarrollar identidades y piezas visuales cuidadas, convirtiendo cada idea en una propuesta clara, atractiva y coherente. En esta web presento una selección de los proyectos que mejor representan mi trabajo.
-              </p>
-              
-              <div className="grid sm:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">2019</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Trabajando en diseño</div>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-4xl text-[#1a1a2e] leading-none">Freelance</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Modalidad de trabajo</div>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs font-medium px-4 py-2 rounded-full bg-[#FF5C00] text-white">Adobe Photoshop</span>
-                <span className="text-xs font-medium px-4 py-2 rounded-full bg-[#FF5C00] text-white">Illustrator</span>
-                <span className="text-xs font-medium px-4 py-2 rounded-full bg-[#FF5C00] text-white">After Effects</span>
-                <span className="text-xs font-medium px-4 py-2 rounded-full bg-[#FF5C00] text-white">Premiere</span>
+            <div className="mt-20 border-t border-black/20 pt-10">
+              <span className="section-kicker border-black/20 text-[#171719]">Así trabajamos</span>
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
+                {pasos.map(([numero, titulo, descripcion]) => (
+                  <article key={numero} className="rounded-[24px] border border-black/15 bg-[#f4f0e8] p-6 md:p-8">
+                    <div className="mb-10 flex items-center justify-between">
+                      <span className="text-xs font-semibold text-[#ff5c00]">{numero}</span>
+                      <Check className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-serif text-3xl font-bold">{titulo}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-[#5f5c61]">{descripcion}</p>
+                  </article>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="h-5" />
-
-      {/* PROJECTS SECTION */}
-      <section id="proyectos" className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-        <div className="bg-[#F5F2ED] rounded-[20px] p-6 md:p-12">
-          {/* Header with achievements */}
-          <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center mb-12">
-            <h2 className="font-serif font-bold text-[#1a1a2e] text-[clamp(48px,7vw,80px)] leading-none">
-              Trabajos<br />Recientes
-            </h2>
-            
-            <div className="bg-[#FF5C00] rounded-2xl p-8 relative min-h-[220px] overflow-hidden">
-              <div className="relative h-[170px]">
-                {logros.map((logro, i) => (
-                  <span 
-                    key={logro}
-                    className="absolute bg-[#F5F2ED] text-[#1a1a2e] text-[13px] font-medium px-5 py-2.5 rounded-full whitespace-nowrap shadow-lg"
-                    style={{
-                      bottom: `${10 + i * 35}px`,
-                      left: `${i * 60}px`,
-                      transform: "rotate(-8deg)"
-                    }}
-                  >
-                    {logro}
+        <section className="bg-[#f4f0e8] px-5 py-20 md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="mb-12 grid gap-6 md:grid-cols-2 md:items-end">
+              <div>
+                <span className="section-kicker">Experiencias reales</span>
+                <h2 className="mt-4 font-serif text-[clamp(3rem,6vw,6rem)] font-bold leading-[0.9] tracking-[-0.05em]">
+                  Lo que dicen<br /><em className="font-normal text-[#ff5c00]">al trabajar conmigo.</em>
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-2 md:justify-end">
+                {clientes.map((cliente) => (
+                  <span key={cliente} className="rounded-full border border-[#171719]/20 px-4 py-2 text-xs font-semibold">
+                    {cliente}
                   </span>
                 ))}
               </div>
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 font-serif text-[28px] text-white whitespace-nowrap">
-                Logros
-              </span>
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-2">
+              <article className="flex min-h-[420px] flex-col justify-between rounded-[28px] bg-[#171719] p-7 text-white md:p-10">
+                <span className="font-serif text-6xl leading-none text-[#ff5c00]">“</span>
+                <blockquote className="my-10 font-serif text-2xl leading-snug md:text-3xl">{testimonios[0].texto}</blockquote>
+                <footer className="border-t border-white/15 pt-5">
+                  <strong className="block text-sm">{testimonios[0].autor}</strong>
+                  <span className="text-xs text-white/45">{testimonios[0].cargo}</span>
+                </footer>
+              </article>
+
+              <div className="grid gap-5">
+                {testimonios.slice(1).map((testimonio) => (
+                  <article key={testimonio.autor} className="rounded-[24px] border border-[#171719]/15 bg-white p-6 md:p-7">
+                    <blockquote className="text-sm leading-relaxed text-[#4f4c51]">“{testimonio.texto}”</blockquote>
+                    <footer className="mt-5 flex items-center justify-between border-t border-[#171719]/10 pt-4">
+                      <strong className="text-sm">{testimonio.autor}</strong>
+                      <span className="text-xs text-[#777379]">{testimonio.cargo}</span>
+                    </footer>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Filter pills */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {categorias.map(cat => (
-              <button 
-                key={cat}
-                onClick={() => setFiltroActivo(cat)}
-                className={`text-[13px] font-medium px-[18px] py-2 rounded-full border-[1.5px] cursor-pointer transition-all ${
-                  filtroActivo === cat 
-                    ? "bg-[#1a1a2e] text-white border-[#1a1a2e]" 
-                    : "bg-transparent text-[#1a1a2e] border-[#ddd] hover:border-[#FF5C00] hover:text-[#FF5C00]"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        <section id="contacto" className="bg-[#171719] px-5 py-20 text-white md:px-10 md:py-28">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="mb-14 border-b border-white/15 pb-14">
+              <span className="section-kicker text-[#ff7a32]">Tu próximo proyecto</span>
+              <h2 className="mt-5 max-w-6xl font-serif text-[clamp(3.4rem,8vw,8.8rem)] font-bold leading-[0.86] tracking-[-0.06em]">
+                Hagamos algo que tu marca pueda llamar <em className="font-normal text-[#ff5c00]">propio.</em>
+              </h2>
+            </div>
 
-          {/* Projects grid */}
-          <div className="grid md:grid-cols-2 gap-5">
-            {proyectosFiltrados.map(proyecto => {
-              const primeraImagen = proyecto.medios?.[0]?.url || "/placeholder.jpg"
-              const categorias = Array.isArray(proyecto.categoria) ? proyecto.categoria : [proyecto.categoria]
-              
-              return (
-                <Link 
-                  key={proyecto.id}
-                  href={`/proyecto/${proyecto.id}`}
-                  className="project-card rounded-2xl overflow-hidden relative bg-[#ddd] aspect-[4/3] cursor-pointer group"
-                >
-                  <Image
-                    src={primeraImagen}
-                    alt={proyecto.titulo}
-                    fill
-                    className="object-cover transition-transform duration-400 group-hover:scale-[1.04]"
-                  />
-                  <div className="project-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="font-serif text-lg text-white mb-1">{proyecto.titulo}</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {categorias.slice(0, 3).map(cat => (
-                        <span key={cat} className="text-[11px] px-2.5 py-[3px] bg-[#FF5C00] text-white rounded-full">
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <div className="h-5" />
-
-      {/* TESTIMONIALS SECTION */}
-      <section className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-        <div className="bg-[#FF5C00] rounded-[20px] p-6 md:p-14">
-          <div className="flex items-center gap-3 mb-8">
-            <h2 className="text-xl font-medium text-white">Testimonios</h2>
-            <span className="text-[#F5F2ED] text-xl">◆</span>
-            <div className="flex-1 h-px bg-white/40" />
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-5">
-            {testimonios.map((t, i) => (
-              <div 
-                key={i}
-                className="bg-white/[0.12] border border-white/20 rounded-2xl p-7 backdrop-blur-[10px]"
-              >
-                <p className="text-sm leading-[1.7] text-white mb-5 italic">
-                  &ldquo;{t.texto}&rdquo;
+            <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
+              <div>
+                <p className="max-w-md leading-relaxed text-white/55">
+                  Si tenés una idea, una marca que necesita orden o un proyecto por empezar, escribime. No hace falta que sepas exactamente qué pedir.
                 </p>
-                <div>
-                  <strong className="text-sm font-semibold text-white block">{t.autor}</strong>
-                  <span className="text-xs text-white/70">{t.cargo}</span>
+
+                <div className="mt-8 flex flex-col items-start gap-4 text-sm">
+                  <a href="mailto:gabrielanibaldi@gmail.com" className="group flex items-center gap-3 hover:text-[#ff7a32]">
+                    <Mail className="h-4 w-4" />
+                    gabrielanibaldi@gmail.com
+                    <ArrowUpRight className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </a>
+                  <a href="https://instagram.com/gabitogfx" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 hover:text-[#ff7a32]">
+                    <Instagram className="h-4 w-4" />
+                    @gabitogfx
+                    <ArrowUpRight className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </a>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <div className="h-5" />
-
-      {/* CONTACT SECTION */}
-      <section id="contacto" className="mx-4 md:mx-10 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-        <div className="bg-[#F5F2ED] rounded-[20px] p-6 md:p-14">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
-            {/* Left: Title */}
-            <div>
-              <h2 className="font-serif font-bold text-[#1a1a2e] text-[clamp(40px,5vw,56px)] leading-[1.1] mb-4">
-                Trabajemos<br />juntos
-              </h2>
-              <p className="text-base text-[#4a4a6a] leading-[1.6]">
-                Si tenés un proyecto en mente o querés llevar tu marca al siguiente nivel, escribime y charlamos.
-              </p>
-            </div>
-            
-            {/* Right: Contact Links */}
-            <div className="flex flex-col gap-3">
-              <a 
-                href="mailto:gabrielanibaldi@gmail.com"
-                className="flex items-center gap-3 p-3.5 px-5 bg-white border-[1.5px] border-[#e5e1da] rounded-xl hover:border-[#FF5C00] hover:translate-x-1 transition-all"
-              >
-                <div className="w-8 h-8 bg-[#FF5C00] rounded-lg flex items-center justify-center text-white flex-shrink-0">
-                  <Mail className="w-[14px] h-[14px]" />
+              <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+                <label className="contact-field">
+                  <span>Nombre</span>
+                  <input
+                    type="text"
+                    placeholder="¿Cómo te llamás?"
+                    value={formData.nombre}
+                    onChange={(event) => setFormData({ ...formData, nombre: event.target.value })}
+                    required
+                  />
+                </label>
+                <label className="contact-field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={formData.email}
+                    onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+                    required
+                  />
+                </label>
+                <label className="contact-field md:col-span-2">
+                  <span>Contame sobre el proyecto</span>
+                  <textarea
+                    placeholder="Qué necesitás, en qué etapa estás o qué querés mejorar..."
+                    value={formData.mensaje}
+                    onChange={(event) => setFormData({ ...formData, mensaje: event.target.value })}
+                    required
+                    rows={5}
+                  />
+                </label>
+                <div className="flex flex-col gap-3 md:col-span-2 md:flex-row md:items-center md:justify-between">
+                  <p aria-live="polite" className={`text-xs ${formStatus === "error" ? "text-red-300" : "text-white/50"}`}>
+                    {formStatus === "success" && "¡Mensaje enviado! Te respondo lo antes posible."}
+                    {formStatus === "error" && "No se pudo enviar. Probá de nuevo o escribime por email."}
+                  </p>
+                  <button
+                    type="submit"
+                    disabled={formStatus === "loading"}
+                    className="group flex cursor-pointer items-center justify-center gap-3 rounded-full bg-[#ff5c00] px-7 py-4 text-sm font-semibold text-white hover:bg-[#ff7426] disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {formStatus === "loading" ? "Enviando..." : "Enviar consulta"}
+                    <Send className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </button>
                 </div>
-                <span className="text-[15px] text-[#1a1a2e]">gabrielanibaldi@gmail.com</span>
-              </a>
-              
-              <a 
-                href="https://instagram.com/gabitogfx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3.5 px-5 bg-white border-[1.5px] border-[#e5e1da] rounded-xl hover:border-[#FF5C00] hover:translate-x-1 transition-all"
-              >
-                <div className="w-8 h-8 bg-[#FF5C00] rounded-lg flex items-center justify-center text-white flex-shrink-0">
-                  <Instagram className="w-[14px] h-[14px]" />
-                </div>
-                <span className="text-[15px] text-[#1a1a2e]">@gabitogfx</span>
-              </a>
-              
-              <a 
-                href="https://twitter.com/gabito_gfx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3.5 px-5 bg-white border-[1.5px] border-[#e5e1da] rounded-xl hover:border-[#FF5C00] hover:translate-x-1 transition-all"
-              >
-                <div className="w-8 h-8 bg-[#FF5C00] rounded-lg flex items-center justify-center text-white flex-shrink-0">
-                  <svg className="w-[14px] h-[14px]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </div>
-                <span className="text-[15px] text-[#1a1a2e]">@gabito_gfx</span>
-              </a>
-              
-              <a 
-                href="https://www.behance.net/gaby1020"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3.5 px-5 bg-white border-[1.5px] border-[#e5e1da] rounded-xl hover:border-[#FF5C00] hover:translate-x-1 transition-all"
-              >
-                <div className="w-8 h-8 bg-[#FF5C00] rounded-lg flex items-center justify-center text-white flex-shrink-0">
-                  <svg className="w-[14px] h-[14px]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 1.211.994 1.948 2.527 1.948.902 0 1.494-.285 1.812-.821h2.417zm-3.09-4.018c-.11-.89-.76-1.569-1.918-1.569-1.153 0-1.853.67-2.017 1.569h3.935zM9 5v14H3V5h6zm-3.5 9.5c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z"/>
-                  </svg>
-                </div>
-                <span className="text-[15px] text-[#1a1a2e]">Behance Portfolio</span>
-              </a>
+              </form>
             </div>
           </div>
-          
-          {/* Contact Form */}
-          <div className="mt-10 pt-10 border-t border-[#e5e1da]">
-            <h3 className="text-lg font-medium text-[#1a1a2e] mb-6">O enviame un mensaje directo</h3>
-            <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={formData.nombre}
-                onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                required
-                className="p-4 rounded-xl bg-white border-[1.5px] border-[#e5e1da] text-[#1a1a2e] placeholder:text-[#4a4a6a] focus:border-[#FF5C00] focus:outline-none"
-              />
-              <input
-                type="email"
-                placeholder="Tu email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-                className="p-4 rounded-xl bg-white border-[1.5px] border-[#e5e1da] text-[#1a1a2e] placeholder:text-[#4a4a6a] focus:border-[#FF5C00] focus:outline-none"
-              />
-              <textarea
-                placeholder="Tu mensaje"
-                value={formData.mensaje}
-                onChange={(e) => setFormData({...formData, mensaje: e.target.value})}
-                required
-                rows={4}
-                className="p-4 rounded-xl bg-white border-[1.5px] border-[#e5e1da] text-[#1a1a2e] placeholder:text-[#4a4a6a] focus:border-[#FF5C00] focus:outline-none md:col-span-2 resize-none"
-              />
-              <button
-                type="submit"
-                disabled={formStatus === "loading"}
-                className="md:col-span-2 bg-[#FF5C00] text-white py-4 px-8 rounded-full font-medium hover:bg-[#CC4A00] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-              >
-                {formStatus === "loading" ? "Enviando..." : "Enviar mensaje"}
-                <Send className="w-4 h-4" />
-              </button>
-              {formStatus === "success" && (
-                <p className="md:col-span-2 text-green-600 text-center text-sm">Mensaje enviado correctamente</p>
-              )}
-              {formStatus === "error" && (
-                <p className="md:col-span-2 text-red-600 text-center text-sm">Error al enviar el mensaje</p>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* FOOTER */}
-      <footer className="text-center py-8 md:py-10 px-10 text-[13px] text-white/60">
-        © {new Date().getFullYear()} GabitoGFX. Todos los derechos reservados.
+      <footer className="border-t border-white/10 bg-[#171719] px-5 py-8 text-white md:px-10">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-4 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} GabitoGFX · Gabriel Anibaldi</p>
+          <a href="#inicio" className="flex items-center gap-2 hover:text-white">
+            Volver arriba <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+        </div>
       </footer>
     </div>
   )

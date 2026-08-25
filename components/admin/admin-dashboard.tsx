@@ -21,7 +21,7 @@ interface ProjectMedia {
 interface Project {
   id: string
   titulo: string
-  categoria: string
+  categoria: string[]
   descripcion: string
   duracion: string
   anho: number

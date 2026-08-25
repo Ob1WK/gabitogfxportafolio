@@ -8,10 +8,15 @@ export const dynamicParams = true
 
 // Generate static params for known projects - uses a simple client without cookies
 export async function generateStaticParams() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) return []
+
   // Use a simple Supabase client for build time (no cookies needed)
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    supabaseUrl,
+    supabaseKey
   )
   const { data: projects } = await supabase.from("projects").select("id")
   

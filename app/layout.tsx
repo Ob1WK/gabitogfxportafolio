@@ -19,8 +19,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "GabitoGFX — Gabriel Anibaldi",
-  description: "Diseñador gráfico y motion designer creando marcas que se ven bien y conectan de verdad.",
-  generator: "v0.app",
+  description: "Diseñador gráfico freelance especializado en branding, identidad visual y piezas digitales.",
   icons: {
     icon: "/favicon.png",
   },
