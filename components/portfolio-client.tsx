@@ -23,14 +23,11 @@ interface PortfolioClientProps {
 const servicios = [
   "Diseño Gráfico",
   "Branding", 
-  "Motion Graphics",
   "Identidad Visual",
   "Edición de Video"
 ]
 
 const logros = [
-  "Behance Featured",
-  "Instagram 1K+",
   "Club Argentino",
   "Gaming-City",
   "Barbatero"
@@ -51,6 +48,11 @@ const testimonios = [
     texto: "Gaby fue una parte fundamental del equipo de marketing. Siempre cumplió con todo, con mucha calidad y rapidez.",
     autor: "Pablo Leis",
     cargo: "Gaming-City"
+  },
+  {
+    texto: "Gabriel supo plasmar las ideas que tenía para Almendro y convertirlas en una identidad completa y coherente. Yo no sabía exactamente qué necesitaba pedir, pero su propuesta integral me ayudó a descubrir todo lo que la marca necesitaba y hoy veo el valor de cada elemento.",
+    autor: "Carolina",
+    cargo: "Almendro"
   }
 ]
 
@@ -110,7 +112,7 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
             {/* Left: Text */}
             <div className="pt-4 md:pt-10">
               <p className="text-lg md:text-[18px] font-normal text-[#1a1a2e] leading-[1.5] max-w-[380px]">
-                Soy Gabriel Anibaldi, diseñador gráfico y motion designer creando marcas que se ven bien y conectan de verdad.
+                Soy Gabriel Anibaldi, diseñador gráfico freelance. Creo identidades y piezas visuales que se ven bien y conectan de verdad.
               </p>
             </div>
             
@@ -159,11 +161,11 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
                 <span className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#F5F2ED] text-[#1a1a2e] border border-[#e5e1da]">Contacto</span>
               </div>
               <p className="text-sm text-[#1a1a2e] mb-4 leading-[1.5]">
-                Soy Gabriel Anibaldi, diseñador gráfico y motion designer...
+                Soy Gabriel Anibaldi, diseñador gráfico freelance...
               </p>
               <div className="bg-[#FF5C00] rounded-xl p-5 pb-6 relative h-[200px] overflow-hidden mb-0">
                 <div className="relative h-[155px]">
-                  {["Diseño Gráfico", "Branding", "Motion", "Identidad", "Video"].map((s, i) => (
+                  {["Diseño Gráfico", "Branding", "Identidad", "Video"].map((s, i) => (
                     <span 
                       key={s}
                       className="absolute bg-[#F5F2ED] text-[#1a1a2e] text-[11px] font-medium px-3.5 py-[7px] rounded-full whitespace-nowrap"
@@ -195,25 +197,17 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
               </div>
               
               <p className="text-base leading-[1.7] text-[#1a1a2e] mb-8">
-                Desde 2019 trabajo en diseño gráfico y motion. Me enfoco en proyectos que se sientan refinados e impactantes, convirtiendo ideas en marcas únicas y memorables. Me gusta darle forma a la presencia de una marca a través de diseño cuidado y experiencias visuales claras.
+                Desde 2019 trabajo de manera freelance en diseño gráfico. Me enfoco en desarrollar identidades y piezas visuales cuidadas, convirtiendo cada idea en una propuesta clara, atractiva y coherente. En esta web presento una selección de los proyectos que mejor representan mi trabajo.
               </p>
               
-              <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="grid sm:grid-cols-2 gap-6 mb-8">
                 <div>
-                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">25+</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Proyectos completados</div>
+                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">2019</div>
+                  <div className="text-[13px] text-[#4a4a6a] mt-1">Trabajando en diseño</div>
                 </div>
                 <div>
-                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">15+</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Clientes satisfechos</div>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">5+</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Marcas colaboradas</div>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-5xl text-[#1a1a2e] leading-none">5+</div>
-                  <div className="text-[13px] text-[#4a4a6a] mt-1">Años de experiencia</div>
+                  <div className="font-serif font-bold text-4xl text-[#1a1a2e] leading-none">Freelance</div>
+                  <div className="text-[13px] text-[#4a4a6a] mt-1">Modalidad de trabajo</div>
                 </div>
               </div>
               
@@ -324,7 +318,7 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
             <div className="flex-1 h-px bg-white/40" />
           </div>
           
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5">
             {testimonios.map((t, i) => (
               <div 
                 key={i}
@@ -362,13 +356,13 @@ export default function PortfolioClient({ projects }: PortfolioClientProps) {
             {/* Right: Contact Links */}
             <div className="flex flex-col gap-3">
               <a 
-                href="mailto:gabitogfx@gmail.com"
+                href="mailto:gabrielanibaldi@gmail.com"
                 className="flex items-center gap-3 p-3.5 px-5 bg-white border-[1.5px] border-[#e5e1da] rounded-xl hover:border-[#FF5C00] hover:translate-x-1 transition-all"
               >
                 <div className="w-8 h-8 bg-[#FF5C00] rounded-lg flex items-center justify-center text-white flex-shrink-0">
                   <Mail className="w-[14px] h-[14px]" />
                 </div>
-                <span className="text-[15px] text-[#1a1a2e]">gabitogfx@gmail.com</span>
+                <span className="text-[15px] text-[#1a1a2e]">gabrielanibaldi@gmail.com</span>
               </a>
               
               <a 
